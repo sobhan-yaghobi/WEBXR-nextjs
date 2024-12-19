@@ -126,7 +126,7 @@ export default function ARPage() {
       setIsARSessionActive(true);
 
       // Hide the button and show the AR view
-      const mainElement = document.querySelector('.main');
+      const mainElement : HTMLElement = document.querySelector('.main')!;
       if (mainElement) {
         mainElement.style.display = 'none';  // Hide the button
       }
