@@ -52,98 +52,94 @@
 //   )
 // }
 
-import { useEffect, useRef, useState } from "react"
-import { WebGLRenderer, Scene, PerspectiveCamera, AmbientLight } from "three"
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
+import { useEffect, useRef, useState } from 'react';
+import { WebGLRenderer, Scene, PerspectiveCamera, AmbientLight } from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 export default function ARPage() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [isSupported, setIsSupported] = useState(false)
-  const [isARSessionActive, setIsARSessionActive] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isSupported, setIsSupported] = useState(false);
+  const [isARSessionActive, setIsARSessionActive] = useState(false);
 
   useEffect(() => {
     // Check for AR support on the device
     if (navigator.xr) {
-      navigator.xr
-        .isSessionSupported("immersive-ar")
+      navigator.xr.isSessionSupported('immersive-ar')
         .then((supported) => setIsSupported(supported))
-        .catch(() => setIsSupported(false))
+        .catch(() => setIsSupported(false));
     } else {
-      setIsSupported(false)
+      setIsSupported(false);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    if (!isSupported || !containerRef.current) return
+    if (!isSupported || !containerRef.current) return;
 
-    const renderer = new WebGLRenderer({ antialias: true })
-    renderer.setSize(window.innerWidth, window.innerHeight)
-    renderer.xr.enabled = true
+    const renderer = new WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.xr.enabled = true;
 
-    const scene = new Scene()
-    const camera = new PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    )
-    const light = new AmbientLight(0xffffff, 1)
-    scene.add(light)
+    const scene = new Scene();
+    const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const light = new AmbientLight(0xffffff, 1);
+    scene.add(light);
 
-    const loader = new GLTFLoader()
-    loader.load("/persian-carpet.glb", (gltf) => {
-      const model = gltf.scene
-      scene.add(model)
-    })
+    const loader = new GLTFLoader();
+    loader.load('/persian-carpet.glb', (gltf) => {
+      const model = gltf.scene;
+      scene.add(model);
+    });
 
-    containerRef.current.appendChild(renderer.domElement)
+    containerRef.current.appendChild(renderer.domElement);
 
     // Start the render loop
     renderer.setAnimationLoop(() => {
       if (isARSessionActive) {
         // Only render if AR session is active
-        renderer.render(scene, camera)
+        renderer.render(scene, camera);
       }
-    })
+    });
 
     return () => {
-      containerRef.current?.removeChild(renderer.domElement)
-    }
-  }, [isSupported, isARSessionActive])
+      containerRef.current?.removeChild(renderer.domElement);
+    };
+  }, [isSupported, isARSessionActive]);
 
   const startARSession = async () => {
-    if (!navigator.xr) return
+    if (!navigator.xr) return;
 
     // Create the renderer for AR
-    const renderer = new WebGLRenderer({ antialias: true })
-    renderer.xr.enabled = true
+    const renderer = new WebGLRenderer({ antialias: true });
+    renderer.xr.enabled = true;
 
-    // Request AR session
     try {
-      const session = await navigator.xr.requestSession("immersive-ar", {
-        optionalFeatures: ["dom-overlay"],
-      })
+      // Request AR session
+      const session = await navigator.xr.requestSession('immersive-ar', {
+        requiredFeatures: ['local', 'hit-test'],
+        optionalFeatures: ['dom-overlay'],
+      });
 
-      // Set AR session to renderer
-      renderer.xr.setSession(session)
+      // Set the renderer's session to the AR session
+      renderer.xr.setSession(session);
 
       // Set the AR session active
-      setIsARSessionActive(true)
+      setIsARSessionActive(true);
 
       // Hide the button and show the AR view
-      const mainElement: HTMLElement = document.querySelector(".main")!
+      const mainElement = document.querySelector('.main');
       if (mainElement) {
-        mainElement.style.display = "none" // Hide the button
+        mainElement.style.display = 'none';  // Hide the button
       }
 
       // Optionally, go full-screen if you want the AR session to take up the entire screen
       if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen()
+        document.documentElement.requestFullscreen();
       }
+
     } catch (err) {
-      console.error("Error starting AR session:", err)
+      console.error('Error starting AR session:', err);
     }
-  }
+  };
 
   return (
     <div className="ar-page">
@@ -161,5 +157,5 @@ export default function ARPage() {
         )}
       </main>
     </div>
-  )
+  );
 }
