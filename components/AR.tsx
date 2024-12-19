@@ -4,7 +4,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import { ARButton } from "three/examples/jsm/webxr/ARButton.js"
 
 export default function CarpetAR() {
-  const containerRef = useRef<HTMLCanvasElement | null>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const renderer = new WebGLRenderer({ antialias: true })
